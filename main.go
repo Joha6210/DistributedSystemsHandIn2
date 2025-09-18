@@ -41,11 +41,22 @@ func client(ch chan Header) {
 }
 
 func server(ch chan Header) {
-	request := <-ch
-	if request.SYN == 1 {
-		response := Header{1234, 1234, 300, request.seqNo + 1, 1, 0, 1, 0}
-		fmt.Printf("Seq=%d, Ack=%d \n", response.seqNo, response.AckNo)
-		ch <- response
+	connEstablished := false
+
+	for !connEstablished {
+		request := <-ch
+		if request.SYN == 1 {
+			response := Header{1234, 1234, 300, request.seqNo + 1, 1, 0, 1, 0}
+			fmt.Printf("Seq=%d, Ack=%d \n", response.seqNo, response.AckNo)
+			ch <- response
+		} else if request.ACK == 1 {
+			connEstablished = true
+		} else{
+			break;
+		}
 	}
+
+	fmt.Println("Connection with client established!")
+	
 
 }
