@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 type Header struct {
@@ -51,9 +53,16 @@ func server(ch2 chan Header) {
 
 }
 func middleware(ch chan Header, ch2 chan Header) {
+	rand.Seed(7)
+	x := rand.Int()
 	request := <-ch
+	switch x % 2 {
+	case 0:
+		time.Sleep(30 * time.Millisecond)
+		ch2 <- request
+	case 1:
 
-	ch2 <- request
+	}
 
 	request2 := <-ch2
 	ch <- request2
