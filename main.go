@@ -18,9 +18,10 @@ type Header struct {
 func main() {
 	fmt.Println("hello")
 	ch := make(chan Header)
+	ch2 := make(chan Header)
+	go middleware(ch, ch2)
 	go client(ch)
-	go server(ch)
-
+	go server(ch2)
 	for {
 
 	}
@@ -40,23 +41,20 @@ func client(ch chan Header) {
 
 }
 
-func server(ch chan Header) {
-	connEstablished := false
-
-	for !connEstablished {
-		request := <-ch
-		if request.SYN == 1 {
-			response := Header{1234, 1234, 300, request.seqNo + 1, 1, 0, 1, 0}
-			fmt.Printf("Seq=%d, Ack=%d \n", response.seqNo, response.AckNo)
-			ch <- response
-		} else if request.ACK == 1 {
-			connEstablished = true
-		} else{
-			break;
-		}
+func server(ch2 chan Header) {
+	request := <-ch2
+	if request.SYN == 1 {
+		response := Header{1234, 1234, 300, request.seqNo + 1, 1, 0, 1, 0}
+		fmt.Printf("Seq=%d, Ack=%d \n", response.seqNo, response.AckNo)
+		ch2 <- response
 	}
 
-	fmt.Println("Connection with client established!")
-	
+}
+func middleware(ch chan Header, ch2 chan Header) {
+	request := <-ch
 
+	ch2 <- request
+
+	request2 := <-ch2
+	ch <- request2
 }
