@@ -2,61 +2,53 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
-type Header struct {
-	sourcePort      int
-	destinationPort int
-	seqNo           int
-	AckNo           int
-	ACK             int
-	RST             int
-	SYN             int
-	FIN             int
-}
-
 func main() {
-	fmt.Println("hello")
-	ch := make(chan Header)
-	go client(ch)
-	go server(ch)
+	//ch := make(chan Packet)
+	//go clientThread(ch)
+	//go serverThread(ch)
+
+	go server("tcp", ":8080")
+	time.Sleep(100 * time.Millisecond)
+	go client("tcp", "127.0.0.1:8080")
 
 	for {
-
+		time.Sleep(100 * time.Millisecond)
 	}
 
 }
 
-func client(ch chan Header) {
-	request := Header{1234, 1234, 100, 0, 0, 0, 1, 0}
-	fmt.Printf("Seq=%d, Ack=%d \n", request.seqNo, request.AckNo)
+func clientThread(ch chan Packet) {
+	request := Packet{1234, 1234, 100, 0, 0, 0, 1, 0}
+	fmt.Printf("Seq=%d, Ack=%d \n", request.SeqNo, request.AckNo)
 	ch <- request
 	response := <-ch
 	if response.SYN == 1 && response.ACK == 1 {
-		request = Header{1234, 1234, response.AckNo, response.seqNo + 1, 1, 0, 0, 0}
-		fmt.Printf("Seq=%d, Ack=%d \n", request.seqNo, request.AckNo)
+		request = Packet{1234, 1234, response.AckNo, response.SeqNo + 1, 1, 0, 0, 0}
+		fmt.Printf("Seq=%d, Ack=%d \n", request.SeqNo, request.AckNo)
 		ch <- request
 	}
 
 }
 
-func server(ch chan Header) {
+func serverThread(ch chan Packet) {
 	connEstablished := false
 
 	for !connEstablished {
 		request := <-ch
 		if request.SYN == 1 {
-			response := Header{1234, 1234, 300, request.seqNo + 1, 1, 0, 1, 0}
-			fmt.Printf("Seq=%d, Ack=%d \n", response.seqNo, response.AckNo)
+			response := Packet{1234, 1234, 300, request.SeqNo + 1, 1, 0, 1, 0}
+			fmt.Printf("Seq=%d, Ack=%d \n", response.SeqNo, response.AckNo)
 			ch <- response
 		} else if request.ACK == 1 {
 			connEstablished = true
-		} else{
-			break;
+		} else {
+			break
 		}
 	}
 
 	fmt.Println("Connection with client established!")
-	
 
 }
