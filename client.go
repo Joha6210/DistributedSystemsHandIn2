@@ -36,6 +36,11 @@ func client(network, addr string) {
 
 	if !connected {
 		fmt.Println("Client: Connection could not be established after 3 retries.")
+		return
+	}
+
+	for {
+		time.Sleep(100 * time.Millisecond)
 	}
 
 }

@@ -28,11 +28,7 @@ func main() {
 	go server("tcp", ":8090")
 	time.Sleep(100 * time.Millisecond)
 	go middleware("tcp", ":8080", "127.0.0.1:8090")
-	go client("tcp", "127.0.0.1:8080")
-
-	for {
-		time.Sleep(100 * time.Millisecond)
-	}
+	client("tcp", "127.0.0.1:8080")
 
 }
 
