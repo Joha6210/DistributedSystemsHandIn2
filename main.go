@@ -2,13 +2,28 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
+type Header struct {
+	sourcePort      int
+	destinationPort int
+	seqNo           int
+	AckNo           int
+	ACK             int
+	RST             int
+	SYN             int
+	FIN             int
+}
+
 func main() {
-	//ch := make(chan Packet)
-	//go clientThread(ch)
-	//go serverThread(ch)
+	fmt.Println("hello")
+	ch := make(chan Packet)
+	ch2 := make(chan Packet)
+	go middleware(ch, ch2)
+	go clientThread(ch)
+	go serverThread(ch2)
 
 	go server("tcp", ":8080")
 	time.Sleep(100 * time.Millisecond)
@@ -33,22 +48,27 @@ func clientThread(ch chan Packet) {
 
 }
 
-func serverThread(ch chan Packet) {
-	connEstablished := false
-
-	for !connEstablished {
-		request := <-ch
-		if request.SYN == 1 {
-			response := Packet{1234, 1234, 300, request.SeqNo + 1, 1, 0, 1, 0}
-			fmt.Printf("Seq=%d, Ack=%d \n", response.SeqNo, response.AckNo)
-			ch <- response
-		} else if request.ACK == 1 {
-			connEstablished = true
-		} else {
-			break
-		}
+func serverThread(ch2 chan Packet) {
+	request := <-ch2
+	if request.SYN == 1 {
+		response := Packet{1234, 1234, 300, request.SeqNo + 1, 1, 0, 1, 0}
+		fmt.Printf("Seq=%d, Ack=%d \n", response.SeqNo, response.AckNo)
+		ch2 <- response
 	}
 
-	fmt.Println("Connection with client established!")
+}
+func middleware(ch chan Packet, ch2 chan Packet) {
+	rand.Seed(7)
+	x := rand.Int()
+	request := <-ch
+	switch x % 2 {
+	case 0:
+		time.Sleep(30 * time.Millisecond)
+		ch2 <- request
+	case 1:
 
+	}
+
+	request2 := <-ch2
+	ch <- request2
 }
