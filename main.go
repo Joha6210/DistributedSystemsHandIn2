@@ -21,12 +21,13 @@ func main() {
 	fmt.Println("hello")
 	ch := make(chan Packet)
 	ch2 := make(chan Packet)
-	go middleware(ch, ch2)
+	go middlewareThread(ch, ch2)
 	go clientThread(ch)
 	go serverThread(ch2)
 
-	go server("tcp", ":8080")
+	go server("tcp", ":8090")
 	time.Sleep(100 * time.Millisecond)
+	go middleware("tcp", ":8080", "127.0.0.1:8090")
 	go client("tcp", "127.0.0.1:8080")
 
 	for {
@@ -57,7 +58,7 @@ func serverThread(ch2 chan Packet) {
 	}
 
 }
-func middleware(ch chan Packet, ch2 chan Packet) {
+func middlewareThread(ch chan Packet, ch2 chan Packet) {
 	rand.Seed(7)
 	x := rand.Int()
 	request := <-ch

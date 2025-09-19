@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"unsafe"
 	"time"
+	"unsafe"
 )
 
 func client(network, addr string) {
@@ -20,13 +20,24 @@ func client(network, addr string) {
 		fmt.Printf("Error in Dial: %s \n", err)
 	}
 
-	connected := handshakeClient(Dial)
+	connected := false
+	retries := 0
 
-	if connected {
-		fmt.Println("Client: Connected success!")
-	}else{
-		fmt.Println("Client: Connected failed!")
+	for !connected && retries < 3 {
+		connected = handshakeClient(Dial)
+		if connected {
+			fmt.Println("Client: Connected successfully!")
+		} else {
+			fmt.Println("Client: Connection attempt failed, retrying...")
+			retries++
+			time.Sleep(1 * time.Second)
+		}
 	}
+
+	if !connected {
+		fmt.Println("Client: Connection could not be established after 3 retries.")
+	}
+
 }
 
 func handshakeClient(conn net.Conn) bool {
@@ -34,13 +45,13 @@ func handshakeClient(conn net.Conn) bool {
 	packet := Packet{1234, 1234, 100, 0, 0, 0, 1, 0} //SYN
 	sendPacket(conn, packet)
 
-	conn.SetDeadline(time.Now().Add(2 * time.Millisecond))
-
 	var data Packet
 	buf := make([]byte, int(unsafe.Sizeof(Packet{})))
+	conn.SetReadDeadline(time.Now().Add(3 * time.Second))
 	_, err := io.ReadFull(conn, buf)
 	if err != nil {
 		fmt.Printf("Client: Error happened when reading %s \n", err)
+		return false
 	} else {
 		binary.Read(
 			bytes.NewReader(buf),
