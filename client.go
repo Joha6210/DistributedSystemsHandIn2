@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"unsafe"
+	"time"
 )
 
 func client(network, addr string) {
@@ -23,6 +24,8 @@ func client(network, addr string) {
 
 	if connected {
 		fmt.Println("Client: Connected success!")
+	}else{
+		fmt.Println("Client: Connected failed!")
 	}
 }
 
@@ -30,6 +33,8 @@ func handshakeClient(conn net.Conn) bool {
 	fmt.Println("Client: Trying handshake...")
 	packet := Packet{1234, 1234, 100, 0, 0, 0, 1, 0} //SYN
 	sendPacket(conn, packet)
+
+	conn.SetDeadline(time.Now().Add(2 * time.Millisecond))
 
 	var data Packet
 	buf := make([]byte, int(unsafe.Sizeof(Packet{})))
@@ -45,7 +50,7 @@ func handshakeClient(conn net.Conn) bool {
 		fmt.Printf("Client: Received from server: %+v\n", data)
 	}
 
-	// Optional: validate SYN-ACK flags
+	//Validate SYN-ACK flags
 	if data.SYN == 1 && data.ACK == 1 {
 		fmt.Println("Client: SYN-ACK received correctly")
 		packet = Packet{1234, 1234, data.AckNo, data.SeqNo + 1, 1, 0, 0, 0} //ACK
