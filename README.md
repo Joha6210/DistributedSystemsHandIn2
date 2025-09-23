@@ -1,9 +1,15 @@
-## a) What are packages in your implementation? What data structure do you use to transmit data and meta-data?
+# Handin 2 - TCP/IP Simulator in Go
 
-## b) Does your implementation use threads or processes? Why is it not realistic to use threads?
+- (1) Is implemented
+- (2) Is implemented
+- (3) Is implemented on both (1) and (2)
 
-## c) In case the network changes the order in which messages are delivered, how would you handle message re-ordering?
+### a) What are packages in your implementation? What data structure do you use to transmit data and meta-data?
 
-## d) In case messages can be delayed or lost, how does your implementation handle message loss?
+### b) Does your implementation use threads or processes? Why is it not realistic to use threads?
 
-## e) Why is the 3-way handshake important?
+### c) In case the network changes the order in which messages are delivered, how would you handle message re-ordering?
+
+### d) In case messages can be delayed or lost, how does your implementation handle message loss?
+
+### e) Why is the 3-way handshake important?
