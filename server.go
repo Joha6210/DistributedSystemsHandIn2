@@ -19,8 +19,6 @@ func server(network, port string) {
 		fmt.Printf("Server: listening on %s... \n", port)
 	}
 
-	for {
-
 		connection, err := Listener.Accept()
 		if err != nil {
 			fmt.Printf("Server: Error in connection: %s", err)
@@ -53,8 +51,6 @@ func server(network, port string) {
 			}
 
 		}
-
-	}
 }
 
 func handleClient(connection net.Conn) {

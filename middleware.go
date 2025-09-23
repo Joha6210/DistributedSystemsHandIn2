@@ -73,7 +73,7 @@ func forwardPackets(src net.Conn, dst net.Conn, label string) {
 		fmt.Printf("Middleware: Packet delay %v\n", delay)
 		time.Sleep(delay)
 
-		// Simulate packet loss (e.g., 5% chance to drop)
+		// Simulate packet loss (e.g., 10% chance to drop)
 		if rand.Float32() < 0.10 {
 			fmt.Printf(label+": Dropped packet (simulated loss): %+v\n", packet)
 			continue
