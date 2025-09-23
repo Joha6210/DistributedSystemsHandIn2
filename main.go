@@ -23,12 +23,12 @@ func main() {
 	ch2 := make(chan Packet)
 	go serverThread(ch2)
 	go middlewareThread(ch, ch2)
-	clientThread(ch)
+	go clientThread(ch)
 
-	// go server("tcp", ":8090")
-	// time.Sleep(100 * time.Millisecond)
-	// go middleware("tcp", ":8080", "127.0.0.1:8090")
-	// client("tcp", "127.0.0.1:8080")
+	go server("tcp", ":8090")
+	time.Sleep(100 * time.Millisecond)
+	go middleware("tcp", ":8080", "127.0.0.1:8090")
+	client("tcp", "127.0.0.1:8080")
 
 }
 
